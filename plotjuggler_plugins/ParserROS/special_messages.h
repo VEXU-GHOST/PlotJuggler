@@ -294,6 +294,32 @@ struct PalStatisticsValues
     return "pal_statistics_msgs/StatisticsValues";
   }
 };
+
+//--------------------
+
+struct LabeledVector
+{
+  std::string label;
+  std::vector<double> data_array;
+
+  static const char* id()
+  {
+    return "ghost_msgs/LabeledVector";
+  }
+};
+
+struct LabeledVectorMap
+{
+  std::vector<LabeledVector> entries;
+
+  static const char* id()
+  {
+    return "ghost_msgs/LabeledVectorMap";
+  }
+};
+
+//--------------------
+
 }  // namespace PJ::Msg
 
 #endif  // SPECIAL_MESSAGES_H

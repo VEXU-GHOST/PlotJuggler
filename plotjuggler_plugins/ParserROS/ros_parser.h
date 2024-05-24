@@ -61,6 +61,9 @@ protected:
 
   void parsePalStatisticsNames(const std::string& prefix, double& timestamp);
   void parsePalStatisticsValues(const std::string& prefix, double& timestamp);
+  
+  void parseLabeledVector(const std::string& prefix, double& timestamp);
+  void parseLabeledVectorMap(const std::string& prefix, double& timestamp);
 
   std::function<void(const std::string& prefix, double&)> _customized_parser;
 

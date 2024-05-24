@@ -88,6 +88,15 @@ ParserROS::ParserROS(const std::string& topic_name, const std::string& type_name
   {
     _customized_parser = std::bind(&ParserROS::parsePalStatisticsValues, this, _1, _2);
   }
+  else if (Msg::LabeledVector::id() == type_name)
+
+  {
+    _customized_parser = std::bind(&ParserROS::parseLabeledVector, this, _1, _2);
+  }
+  else if (Msg::LabeledVectorMap::id() == type_name)
+  {
+    _customized_parser = std::bind(&ParserROS::parseLabeledVectorMap, this, _1, _2);
+  }
 }
 
 bool ParserROS::parseMessage(const PJ::MessageRef serialized_msg, double& timestamp)
@@ -576,4 +585,46 @@ void ParserROS::parsePalStatisticsValues(const std::string& prefix, double& time
       series.pushBack({ timestamp, values[i] });
     }
   }
+}
+
+void ParserROS::parseLabeledVector(const std::string& prefix, double& timestamp){
+  thread_local Msg::LabeledVector msg;
+
+  // Get label
+  std::string label;
+  _deserializer->deserializeString(label);
+
+  // Get data_array
+  msg.data_array.clear();
+  size_t data_array_size = _deserializer->deserializeUInt32();
+  if (data_array_size > 0)
+  {
+    msg.data_array.resize(data_array_size);
+    for (auto& data : msg.data_array)
+    {
+      data = _deserializer->deserialize(FLOAT64).convert<double>();
+    }
+  }
+
+  for (size_t i = 0; i < data_array_size; i++)
+  {
+    std::string series_name = fmt::format("{}/{}/{}", prefix, label, std::to_string(i));
+    getSeries(series_name).pushBack({timestamp, msg.data_array[i]});
+  }
+}
+
+void ParserROS::parseLabeledVectorMap(const std::string& prefix, double& timestamp){
+  thread_local Msg::LabeledVectorMap msg;
+  msg.entries.clear();
+
+  size_t entries_size = _deserializer->deserializeUInt32();
+  if (entries_size > 0)
+  {
+    msg.entries.resize(entries_size);
+    for (auto& entry : msg.entries)
+    {
+      parseLabeledVector(prefix, timestamp);
+    }
+  }
+
 }
