@@ -40,7 +40,7 @@ if(VCPKG_TOOLCHAIN)
 endif()
 
 find_package(ament_cmake QUIET)
-find_package(catkin QUIET)
+# find_package(catkin QUIET)
 
 # http://answers.ros.org/question/230877/optionally-build-a-package-with-catkin/
 if(catkin_FOUND)
@@ -68,6 +68,7 @@ elseif(ament_cmake_FOUND)
 
     find_package(ament_cmake REQUIRED)
     find_package(ament_index_cpp REQUIRED)
+    find_package(ghost_msgs REQUIRED)
     find_package(rclcpp REQUIRED)
     include_directories(${ament_index_cpp_INCLUDE_DIRS})
 
